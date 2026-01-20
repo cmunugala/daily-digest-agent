@@ -1,0 +1,40 @@
+from datetime import datetime
+from typing import List, Optional
+from sqlmodel import SQLModel, Field, Relationship
+
+
+class UserArticleLink(SQLModel, table=True):
+    """Junction table connecting Users and Articles to track 'Seen' history."""
+
+    user_id: Optional[int] = Field(
+        default=None, foreign_key="user.id", primary_key=True
+    )
+    article_id: Optional[int] = Field(
+        default=None, foreign_key="article.id", primary_key=True
+    )
+    seen_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    interests: List["Interest"] = Relationship(back_populates="user")
+    seen_articles: List["Article"] = Relationship(
+        back_populates="viewed_by", link_model=UserArticleLink
+    )
+
+
+class Interest(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    topic: str
+    user_id: int = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="interests")
+
+
+class Article(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    url: str = Field(unique=True)
+    source: str
+    viewed_by: List[User] = Relationship(
+        back_populates="seen_articles", link_model=UserArticleLink
+    )
