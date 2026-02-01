@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def search_arxiv(query, max_results=1):
+def search_arxiv(query, max_results=5):
     search = arxiv.Search(
         query=query, max_results=max_results, sort_by=arxiv.SortCriterion.Relevance
     )
@@ -28,7 +28,7 @@ def search_arxiv(query, max_results=1):
     return results
 
 
-def search_hacker_news(query: str, max_results=1):
+def search_hacker_news(query: str, max_results=5):
     # This searches for stories containing the query, sorted by relevance
     url = "https://hn.algolia.com/api/v1/search_by_date"
     params = {"query": query, "tags": "story", "hitsPerPage": max_results}
@@ -58,7 +58,7 @@ def search_hacker_news(query: str, max_results=1):
         return []
 
 
-def search_the_guardian(query: str, api_key: str, max_results=1):
+def search_the_guardian(query: str, api_key: str, max_results=5):
     url = "https://content.guardianapis.com/search"
     params = {
         "q": query,

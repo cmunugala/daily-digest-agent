@@ -15,7 +15,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 
 
 def init_db():
-    from .models import User
+    import models  # Import the entire models module to register all tables
 
     SQLModel.metadata.create_all(engine)
 
