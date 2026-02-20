@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -14,7 +15,8 @@ from database import engine, init_db
 from models import Article, Interest, User
 from tools import search_arxiv, search_hacker_news, search_the_guardian
 
-load_dotenv()
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
 
 
 # pydantic models for responses
@@ -166,7 +168,7 @@ def mark_articles_as_seen(username: str, digest_text: str):
 
 
 # main llm workflow loop
-if __name__ == "__main__":
+def run_daily_digest_workflow(username: str, user_question: str):
     init_db()
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     current_date = datetime.now().strftime("%Y-%m-%d")
@@ -177,8 +179,6 @@ if __name__ == "__main__":
         pydantic_function_tool(SearchHackerNewsTool, name="search_hacker_news"),
         pydantic_function_tool(SearchTheGuardianTool, name="search_the_guardian"),
     ]
-    username = input("Enter your username: ")
-    user_question = input("What would you like to read/learn about today?:")
 
     personalized_context = get_personalized_context(username, user_question)
 
@@ -274,5 +274,12 @@ if __name__ == "__main__":
 
     daily_digest_response_message = daily_digest_completion.choices[0].message
     digest_output = daily_digest_response_message.parsed.daily_digest
-    print(digest_output)
     mark_articles_as_seen(username, digest_output)
+    return digest_output
+
+
+if __name__ == "__main__":
+    username = input("Enter your username: ")
+    user_question = input("What would you like to read/learn about today?:")
+    digest = run_daily_digest_workflow(username, user_question)
+    print(digest)
