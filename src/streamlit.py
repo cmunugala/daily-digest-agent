@@ -1,9 +1,9 @@
+import requests
 from sqlmodel import Session, select
 
 import streamlit as st
-from agent import run_daily_digest_workflow
-from database import engine, init_db
-from models import Article, Interest, User
+from src.database import engine, init_db
+from src.models import Article, Interest, User
 
 # Page config
 st.set_page_config(page_title="Daily Digest Agent", page_icon="📰", layout="wide")
@@ -12,12 +12,27 @@ st.set_page_config(page_title="Daily Digest Agent", page_icon="📰", layout="wi
 init_db()
 
 
+# --- Functions ---
+def call_digest_api(username: str, user_question: str) -> str:
+    """Calls the backend API to generate a digest."""
+    api_url = "http://api:8000/digest"  # Docker-friendly URL
+    response = requests.post(
+        api_url, json={"username": username, "user_question": user_question}
+    )
+    response.raise_for_status()  # Will raise an exception for 4XX/5XX errors
+    print(response.json()["digest"])
+    return response.json()["digest"]
+
+
+# --- UI ---
 def main():
     st.title("📰 Daily Digest Agent")
-    st.markdown("""
+    st.markdown(
+        """
     Your personalized AI news assistant. Tell me what you're interested in today, 
     and I'll find the latest articles from Arxiv, Hacker News, and The Guardian.
-    """)
+    """
+    )
 
     # Sidebar for User Profile
     with st.sidebar:
@@ -59,16 +74,21 @@ def main():
         else:
             with st.spinner("🤖 Agent is researching and summarizing for you..."):
                 try:
-                    digest = run_daily_digest_workflow(username, user_question)
+                    digest = call_digest_api(username, user_question)
 
                     st.divider()
                     st.subheader("✨ Your Daily Digest")
                     st.markdown(digest)
 
                     st.balloons()
+                except requests.exceptions.RequestException as e:
+                    st.error(f"API request failed: {e}")
+                    st.info(
+                        "Please ensure the backend API service is running. "
+                        "You may need to start it with `docker-compose up`."
+                    )
                 except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
-                    st.info("Check your API keys and database connection.")
+                    st.error(f"An unexpected error occurred: {str(e)}")
 
     # Footer
     st.divider()

@@ -11,9 +11,9 @@ from openai import OpenAI, pydantic_function_tool
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 
-from database import engine, init_db
-from models import Article, Interest, User
-from tools import search_arxiv, search_hacker_news, search_the_guardian
+from src.database import engine, init_db
+from src.models import Article, Interest, User
+from src.tools import search_arxiv, search_hacker_news, search_the_guardian
 
 env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
@@ -54,7 +54,7 @@ class SearchHackerNewsTool(BaseModel):
         description="The search query to find relevant Hacker News stories."
     )
     max_results: Optional[int] = Field(
-        default=5, description="The maximum number of search results to return."
+        default=5, le=10, description="The maximum number of search results to return."
     )
 
 
@@ -98,7 +98,7 @@ def get_personalized_context(username: str, current_query: str):
         ).all()
 
         # Format the interests for the prompt
-        interest_list = [i.topic for i in past_interests][0:10]
+        interest_list = [i.topic for i in past_interests]
         context_string = ", ".join(interest_list)
 
         if current_query not in interest_list:

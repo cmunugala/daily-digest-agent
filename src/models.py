@@ -26,7 +26,7 @@ class User(SQLModel, table=True):
 
 class Interest(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    topic: str = Field(unique=True)
+    topic: str = Field()
     user_id: int = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="interests")
 
@@ -34,7 +34,7 @@ class Interest(SQLModel, table=True):
 class Article(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str = Field(default="No Title")
-    url: str = Field(unique=True)
+    url: Optional[str] = Field(unique=True, nullable=True)
     source: str
     viewed_by: List[User] = Relationship(
         back_populates="seen_articles", link_model=UserArticleLink

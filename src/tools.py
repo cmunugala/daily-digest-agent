@@ -79,6 +79,7 @@ def search_the_guardian(query: str, api_key: str, max_results=5):
                 "date": r.get("webPublicationDate")[:10],
             }
         )
+    print(f"DEBUG: Found {len(results)} articles for {query}")
     return results
 
 
