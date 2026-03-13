@@ -41,11 +41,21 @@ def search_hacker_news(query: str, max_results=5):
 
         results = []
         for hit in data.get("hits", []):
+            external_url = hit.get("url")
+            object_id = hit.get("objectID")  # Algolia uses objectID for the HN ID
+
+            # If url is None, create a link to the HN comment page
+            final_url = (
+                external_url
+                if external_url
+                else f"https://news.ycombinator.com/item?id={object_id}"
+            )
+
             results.append(
                 {
                     "source": "Hacker News",
                     "title": hit.get("title"),
-                    "url": hit.get("url"),
+                    "url": final_url,
                     "points": hit.get("points"),
                     "date": datetime.fromtimestamp(hit.get("created_at_i")).strftime(
                         "%Y-%m-%d"

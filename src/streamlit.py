@@ -15,12 +15,11 @@ init_db()
 # --- Functions ---
 def call_digest_api(username: str, user_question: str) -> str:
     """Calls the backend API to generate a digest."""
-    api_url = "http://api:8000/digest"  # Docker-friendly URL
+    api_url = "http://api:8000/digest"
     response = requests.post(
         api_url, json={"username": username, "user_question": user_question}
     )
-    response.raise_for_status()  # Will raise an exception for 4XX/5XX errors
-    print(response.json()["digest"])
+    response.raise_for_status()
     return response.json()["digest"]
 
 
@@ -37,7 +36,7 @@ def main():
     # Sidebar for User Profile
     with st.sidebar:
         st.header("User Profile")
-        username = st.text_input("Enter your username", value="default_user")
+        username = st.text_input("Enter your username")
 
         if username:
             with Session(engine) as session:
@@ -66,7 +65,7 @@ def main():
         placeholder="e.g., Latest breakthroughs in LLMs, React 19 features, Gaza news...",
     )
 
-    if st.button("Generate My Digest", type="primary"):
+    if st.button("Generate My Digest", type="primary") or user_question:
         if not username:
             st.error("Please enter a username in the sidebar first.")
         elif not user_question:

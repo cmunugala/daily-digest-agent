@@ -6,6 +6,8 @@ from sqlmodel import SQLModel, Field, Relationship
 class UserArticleLink(SQLModel, table=True):
     """Junction table connecting Users and Articles to track 'Seen' history."""
 
+    __table_args__ = {"extend_existing": True}
+
     user_id: Optional[int] = Field(
         default=None, foreign_key="user.id", primary_key=True
     )
@@ -16,6 +18,7 @@ class UserArticleLink(SQLModel, table=True):
 
 
 class User(SQLModel, table=True):
+    __table_args__ = {"extend_existing": True}
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     interests: List["Interest"] = Relationship(back_populates="user")
@@ -25,6 +28,7 @@ class User(SQLModel, table=True):
 
 
 class Interest(SQLModel, table=True):
+    __table_args__ = {"extend_existing": True}
     id: Optional[int] = Field(default=None, primary_key=True)
     topic: str = Field()
     user_id: int = Field(foreign_key="user.id")
@@ -32,9 +36,10 @@ class Interest(SQLModel, table=True):
 
 
 class Article(SQLModel, table=True):
+    __table_args__ = {"extend_existing": True}
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str = Field(default="No Title")
-    url: Optional[str] = Field(unique=True, nullable=True)
+    url: Optional[str] = Field(default=None, unique=True, nullable=True)
     source: str
     viewed_by: List[User] = Relationship(
         back_populates="seen_articles", link_model=UserArticleLink
