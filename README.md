@@ -18,9 +18,9 @@ The **Daily Digest Agent** is a personalized AI-powered news assistant that rese
 ## 🛠️ Tech Stack
 
 - **Agent Logic:** Python, OpenAI (GPT-4o-mini)
-- **Deployment:** [FastAPI], [Streamlit],[Docker]
-- **Database:** [PostgreSQL]
-- **Package Manager:** [uv]
+- **Deployment:** FastAPI, Streamlit,Docker
+- **Database:** PostgreSQL
+- **Package Manager:** uv
 
 ---
 
@@ -44,8 +44,8 @@ The **Daily Digest Agent** is a personalized AI-powered news assistant that rese
 
 ## 📖 Usage
 
-1.  Open the **Streamlit** interface.
-2.  Enter your **Username** in the sidebar. This allows the agent to track your reading history.
+1.  Open the Streamlit interface.
+2.  Enter your Username in the sidebar. This allows the agent to track your reading history.
 3.  Ask a question or provide a topic (e.g., *"What's new in Quantum Computing?"* or *"Latest breakthroughs in React"*).
 4.  The agent will research, filter out anything you've seen before, and generate a personalized digest for you.
 
